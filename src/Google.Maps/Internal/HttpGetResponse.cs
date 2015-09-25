@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace Google.Maps.Internal
@@ -77,7 +78,13 @@ namespace Google.Maps.Internal
         /// Returns the response data as string
         /// </summary>
         /// <returns></returns>
-        public abstract string AsString();
+        protected abstract string AsString();
+
+        /// <summary>
+        /// Returns the response data as string
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Task<string> AsStringAsync();
 
         /// <summary>
         /// Parses the response into its JSON object representation
@@ -86,9 +93,28 @@ namespace Google.Maps.Internal
         /// <returns></returns>
         public virtual T As<T>() where T : class
         {
-            T output = null;
-
             var responseData = AsString();
+            return Convert<T>(responseData);
+        }
+
+
+        /// <summary>
+        /// Parses the response into its JSON object representation
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public async virtual Task<T> AsAsync<T>() where T : class
+        {
+            var responseData = await AsStringAsync();
+            return Convert<T>(responseData);
+        }
+
+
+
+
+        private T Convert<T>(string responseData) where T : class
+        {
+            T output = null;
 
             using (var sr = new StringReader(responseData))
             using (var jsonReader = new JsonTextReader(sr))

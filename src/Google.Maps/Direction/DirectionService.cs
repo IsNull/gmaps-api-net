@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Google.Maps.Direction
 {
@@ -60,6 +61,28 @@ namespace Google.Maps.Direction
             {
                 httpResponse = GetHttpResponse(request, true);
                 geoCoderResponse = httpResponse.As<DirectionResponse>();
+            }
+            return geoCoderResponse;
+        }
+
+
+        /// <summary>
+        /// Sends the specified request to the Google Maps Direction web
+        /// service and parses the response as an DirectionResponse
+        /// object.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// 
+        public async Task<DirectionResponse> GetResponseAsync(DirectionRequest request)
+        {
+            var httpResponse = GetHttpResponse(request);
+            var geoCoderResponse = await httpResponse.AsAsync<DirectionResponse>();
+
+            if (httpResponse.FromCache && geoCoderResponse.Status != ServiceResponseStatus.Ok)
+            {
+                httpResponse = GetHttpResponse(request, true);
+                geoCoderResponse = await httpResponse.AsAsync<DirectionResponse>();
             }
             return geoCoderResponse;
         }

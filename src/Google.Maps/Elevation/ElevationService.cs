@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Google.Maps.Elevation
 {
@@ -61,6 +62,26 @@ namespace Google.Maps.Elevation
             {
                 httpResponse = GetHttpResponse(request, true);
                 geoCoderResponse = httpResponse.As<ElevationResponse>();
+            }
+            return geoCoderResponse;
+        }
+
+        /// <summary>
+        /// Sends the specified request to the Google Maps Elevation web
+        /// service and parses the response as an ElevationResponse
+        /// object.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public async Task<ElevationResponse> GetResponseAsync(ElevationRequest request)
+        {
+            var httpResponse = GetHttpResponse(request);
+            var geoCoderResponse = await httpResponse.AsAsync<ElevationResponse>();
+
+            if (httpResponse.FromCache && geoCoderResponse.Status != ServiceResponseStatus.Ok)
+            {
+                httpResponse = GetHttpResponse(request, true);
+                geoCoderResponse = await httpResponse.AsAsync<ElevationResponse>();
             }
             return geoCoderResponse;
         }

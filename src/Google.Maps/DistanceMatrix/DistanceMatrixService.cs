@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
+using System.Threading.Tasks;
 
 namespace Google.Maps.DistanceMatrix
 {
@@ -62,6 +63,27 @@ namespace Google.Maps.DistanceMatrix
             {
                 httpResponse = GetHttpResponse(request, true);
                 geoCoderResponse = httpResponse.As<DistanceMatrixResponse>();
+            }
+            return geoCoderResponse;
+        }
+
+        /// <summary>
+        /// Sends the specified request to the Google Maps DistanceMatrix web
+        /// service and parses the response as an DistanceMatrixResponse
+        /// object.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// 
+        public async Task<DistanceMatrixResponse> GetResponseAsync(DistanceMatrixRequest request)
+        {
+            var httpResponse = GetHttpResponse(request);
+            var geoCoderResponse = await httpResponse.AsAsync<DistanceMatrixResponse>();
+
+            if (httpResponse.FromCache && geoCoderResponse.Status != ServiceResponseStatus.Ok)
+            {
+                httpResponse = GetHttpResponse(request, true);
+                geoCoderResponse = await httpResponse.AsAsync<DistanceMatrixResponse>();
             }
             return geoCoderResponse;
         }

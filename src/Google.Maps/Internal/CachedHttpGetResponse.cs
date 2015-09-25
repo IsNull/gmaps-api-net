@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Cache;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Google.Maps.Internal
 {
@@ -34,7 +35,7 @@ namespace Google.Maps.Internal
         {
         }
 
-        public override string AsString()
+        protected override string AsString()
         {
             var output = String.Empty;
 
@@ -56,6 +57,27 @@ namespace Google.Maps.Internal
             return output;
         }
 
+        protected async override Task<string> AsStringAsync()
+        {
+            var output = String.Empty;
+
+            var response = await GetResponseAsync(GetSignedUri(), DontUseCache);
+
+            if (response != null)
+            {
+                FromCache = response.IsFromCache;
+                var rs = response.GetResponseStream();
+                if (rs != null)
+                {
+                    using (var reader = new StreamReader(rs))
+                    {
+                        output = await reader.ReadToEndAsync();
+                    }
+                }
+            }
+
+            return output;
+        }
 
 
         /// <summary>
@@ -69,6 +91,19 @@ namespace Google.Maps.Internal
             var request = WebRequest.Create(uri);
             request.CachePolicy = refreshCache ? NoCachePolicy : UseCachePolicy;
             return request.GetResponse();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="refreshCache">Do not use cache but update it with new data</param>
+        /// <returns></returns>
+        private static Task<WebResponse> GetResponseAsync(Uri uri, bool refreshCache)
+        {
+            var request = WebRequest.Create(uri);
+            request.CachePolicy = refreshCache ? NoCachePolicy : UseCachePolicy;
+            return request.GetResponseAsync();
         }
     }
 }

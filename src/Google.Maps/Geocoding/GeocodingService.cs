@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
+using System.Threading.Tasks;
 
 
 namespace Google.Maps.Geocoding
@@ -67,6 +68,29 @@ namespace Google.Maps.Geocoding
             }
             return geoCoderResponse;
 		}
+
+        /// <summary>
+        /// Sends the specified request to the Google Maps Geocoding web
+        /// service and parses the response as an GeocodingResponse
+        /// object.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        /// 
+        public async Task<GeocodeResponse> GetResponseAsync(GeocodingRequest request)
+        {
+            var httpResponse = GetHttpResponse(request);
+            var geoCoderResponse = await httpResponse.AsAsync<GeocodeResponse>();
+
+            if (httpResponse.FromCache && geoCoderResponse.Status != ServiceResponseStatus.Ok)
+            {
+                httpResponse = GetHttpResponse(request, true);
+                geoCoderResponse = await httpResponse.AsAsync<GeocodeResponse>();
+            }
+            return geoCoderResponse;
+        }
+
+
 
 	}
 }

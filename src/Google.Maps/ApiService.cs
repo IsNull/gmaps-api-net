@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Google.Maps.Internal;
 
 namespace Google.Maps
@@ -24,6 +25,18 @@ namespace Google.Maps
         /// <param name="forceNoCache">If set to true, no cached data will be used.</param>
         /// <returns></returns>
         protected HttpGetResponse GetHttpResponse(ApiRequest request, bool forceNoCache = false)
+        {
+            var url = new Uri(this.BaseUri, request.ToUri());
+            return Http.Get(url, forceNoCache);
+        }
+
+        /// <summary>
+        /// Gets a Http-Get-Response from the given ApiRequest
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="forceNoCache">If set to true, no cached data will be used.</param>
+        /// <returns></returns>
+        protected async Task<HttpGetResponse> GetHttpResponseAsync(ApiRequest request, bool forceNoCache = false)
         {
             var url = new Uri(this.BaseUri, request.ToUri());
             return Http.Get(url, forceNoCache);
